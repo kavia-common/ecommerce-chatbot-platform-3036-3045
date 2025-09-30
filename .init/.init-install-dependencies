@@ -1,0 +1,4 @@
+{
+    "command": "npm install --legacy-peer-deps",
+    "working_directory": "/home/kavia/workspace/code-generation/ecommerce-chatbot-platform-3036-3045/chatbot_frontend"
+}
