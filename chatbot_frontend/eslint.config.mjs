@@ -26,8 +26,20 @@ export default [
         it: "readonly",
         expect: "readonly",
         // Browser globals
+        window: "readonly",
+        document: "readonly",
+        navigator: "readonly",
+        Event: "readonly",
+        CustomEvent: "readonly",
         HTMLElement: "readonly",
-        // Node.js globals
+        HTMLInputElement: "readonly",
+        HTMLDivElement: "readonly",
+        KeyboardEvent: "readonly",
+        crypto: "readonly",
+        alert: "readonly",
+        queueMicrotask: "readonly",
+        setTimeout: "readonly",
+        // Node.js globals (SSR/build)
         process: "readonly",
         console: "readonly"
       }

@@ -1,11 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: true,
+  imports: [RouterModule],
+  template: `<router-outlet></router-outlet>`,
+  styles: [``]
 })
-export class AppComponent {
-  title = 'chatbot_frontend is being generated';
+export class AppComponent implements OnDestroy {
+  private navHandler = (ev: Event) => {
+    // @ts-ignore
+    const path = (ev as CustomEvent<string>).detail as string;
+    if (path) this.router.navigateByUrl(path);
+  };
+
+  constructor(private router: Router) {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('app:navigate', this.navHandler as any);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('app:navigate', this.navHandler as any);
+    }
+  }
 }

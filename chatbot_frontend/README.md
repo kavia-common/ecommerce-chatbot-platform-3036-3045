@@ -1,59 +1,35 @@
-# Angular
+# OceanShop Angular Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.1.
+Modern Angular 19 app implementing an ecommerce chatbot experience with the Ocean Professional theme.
 
-## Development server
+Features:
+- Chat interface with AI assistant
+- Product browsing with responsive grid
+- Product detail modal
+- Shopping cart drawer
+- Checkout and confirmation flows
+- Responsive, modern UI with blue (primary) and amber (secondary) accents
 
-To start a local development server, run:
+Run locally:
+1) Install dependencies
+   npm install
+2) Set backend API base URL (optional, defaults to http://localhost:8000/api)
+   export NG_APP_API_BASE="http://localhost:8000/api"
+3) Start the dev server
+   npm start
+   Open http://localhost:3000
 
-```bash
-ng serve
-```
+Build:
+   NG_APP_API_BASE="https://your-backend.example.com/api" npm run build
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Environment variables:
+- NG_APP_API_BASE: Base URL for backend REST API (chat, products, checkout)
 
-## Code scaffolding
+Backend API expectations (placeholders; integrate with your backend):
+- POST   /api/chat           -> ChatResponse
+- GET    /api/products       -> Product[]
+- GET    /api/products/:id   -> Product
+- POST   /api/checkout       -> CheckoutResponse
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Styling:
+- See src/app/README_THEME.md for theme details.
