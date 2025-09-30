@@ -12,9 +12,15 @@ export class ApiService {
   private http = inject(HttpClient);
 
   // PUBLIC_INTERFACE
-  /** Sends a chat message and returns the updated conversation. */
+  /** Sends a chat message and returns the updated conversation. Adds correlation id and logs errors. */
   chat(request: ChatRequest): Observable<ChatResponse> {
-    return this.http.post(`${this.baseUrl}/chat`, request, { responseType: 'json' }) as Observable<ChatResponse>;
+    const correlationId = genId();
+    return (this.http.post(`${this.baseUrl}/chat`, request, { responseType: 'json' }) as Observable<ChatResponse>).pipe(
+      catchError((err: HttpErrorResponse) => {
+        this.logHttpError('chat', err, correlationId, request);
+        return throwError(() => err);
+      })
+    );
   }
 
   // PUBLIC_INTERFACE
@@ -22,13 +28,23 @@ export class ApiService {
   getProducts(query?: string, page = 1, pageSize = 20): Observable<Product[]> {
     let params = new HttpParams().set('page', page).set('pageSize', pageSize);
     if (query) params = params.set('q', query);
-    return this.http.get(`${this.baseUrl}/products`, { params, responseType: 'json' }) as Observable<Product[]>;
+    return (this.http.get(`${this.baseUrl}/products`, { params, responseType: 'json' }) as Observable<Product[]>).pipe(
+      catchError((err: HttpErrorResponse) => {
+        this.logHttpError('getProducts', err);
+        return throwError(() => err);
+      })
+    );
   }
 
   // PUBLIC_INTERFACE
   /** Gets a product by id. */
   getProduct(id: string): Observable<Product> {
-    return this.http.get(`${this.baseUrl}/products/${encodeURIComponent(id)}`, { responseType: 'json' }) as Observable<Product>;
+    return (this.http.get(`${this.baseUrl}/products/${encodeURIComponent(id)}`, { responseType: 'json' }) as Observable<Product>).pipe(
+      catchError((err: HttpErrorResponse) => {
+        this.logHttpError('getProduct', err, undefined, { id });
+        return throwError(() => err);
+      })
+    );
   }
 
   // PUBLIC_INTERFACE
@@ -52,18 +68,43 @@ export class ApiService {
   // PUBLIC_INTERFACE
   /** Performs checkout; expects backend to return an order confirmation. */
   checkout(request: CheckoutRequest): Observable<CheckoutResponse> {
-    return this.http.post(`${this.baseUrl}/checkout`, request, { responseType: 'json' }) as Observable<CheckoutResponse>;
+    const correlationId = genId();
+    return (this.http.post(`${this.baseUrl}/checkout`, request, { responseType: 'json' }) as Observable<CheckoutResponse>).pipe(
+      catchError((err: HttpErrorResponse) => {
+        this.logHttpError('checkout', err, correlationId, request);
+        return throwError(() => err);
+      })
+    );
   }
 
-  private handleError<T>(op: string, error: HttpErrorResponse, fallback?: T): Observable<T> {
-    console.error(`[ApiService:${op}]`, error);
-    if (fallback !== undefined) {
-      return of(fallback);
-    }
-    return throwError(() => error);
+  /** INTERNAL: Uniform HTTP error logger for easier troubleshooting. */
+  private logHttpError(op: string, error: HttpErrorResponse, correlationId?: string, context?: unknown) {
+    const base = `[ApiService:${op}]`;
+    const cid = correlationId ? ` cid=${correlationId}` : '';
+    const status = typeof error.status === 'number' ? ` status=${error.status}` : '';
+    const url = error.url ? ` url=${error.url}` : '';
+    // eslint-disable-next-line no-console
+    console.error(`${base}${cid}${status}${url}`, {
+      message: error.message,
+      name: error.name,
+      error,
+      context,
+      apiBaseUrl: this.baseUrl,
+    });
   }
 }
 
 function round2(n: number) {
   return Math.round(n * 100) / 100;
+}
+
+function genId() {
+  try {
+    // @ts-ignore
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      // @ts-ignore
+      return crypto.randomUUID();
+    }
+  } catch {}
+  return Math.random().toString(36).slice(2);
 }
